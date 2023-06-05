@@ -1,7 +1,7 @@
 const express = require("express");
 const path = require("path");
 const { open } = require("sqlite");
-const sqlite3 = require("sqlite");
+const sqlite3 = require("sqlite3");
 
 const app = express();
 app.use(express.json());
@@ -86,8 +86,8 @@ app.put("/movies/:movieId/", async (request, response) => {
       movie
     SET
        director_id =  '${directorId}',
-       movie_name = ${movieName},
-       lead_actor = '${role}'
+       movie_name = '${movieName}',
+       lead_actor = '${leadActor}'
     WHERE
       movie_id = ${movieId};`;
   await db.run(updateMovieQuery);
@@ -124,10 +124,8 @@ app.get("/directors/:directorId/movies/", async (request, response) => {
     SELECT
       movie_name As movieName
     FROM
-      movie
-    WHERE
-      director_id = ${directorId};`;
-  const movie = await db.get(etDirectorsQuery);
+      movie INNER JOIN director ON movie.director_id=director.director_id;`;
+  const movie = await db.get(getDirectorsQuery);
   response.send(movie);
 });
 
